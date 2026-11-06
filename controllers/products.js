@@ -1,10 +1,10 @@
 const Product = require('../models/product');
 
 const getAllProductsStatic= async(req,res)=>{
-    const search = 'a';
+    
 
-  const products  = await Product.find({name : {$regex : search , $options : 'i'}});
-    res.status(200).json({products});
+  const products  = await Product.find({}).select("name price").limit(10).skip(5);
+    res.status(200).json({products, nbHits: products.length});
 }
 const getAllProducts= async(req,res)=>{
 
@@ -33,7 +33,10 @@ if(fields){
     const fieldList= fields.split(',').join(" ");
     result = result.select(fieldList);
 }
-
+const pageno = Number(req.query.page)||1;
+const limitno= Number(req.query.limit)||10;
+const skipno= (pageno-1)*limitno;
+result= result.skip(skipno).limit(limitno);
 
 const products= await result;
 
